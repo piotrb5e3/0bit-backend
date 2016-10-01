@@ -128,6 +128,10 @@ STATIC_URL = '/static/'
 
 REST_USE_JWT = True
 
+JWT_AUTH = {
+    'JWT_ALLOW_REFRESH': True
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -137,6 +141,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
 }
 
 if DEBUG:

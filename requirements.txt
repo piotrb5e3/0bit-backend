@@ -7,6 +7,7 @@ django-rest-auth==0.8.1
 djangorestframework==3.4.7
 djangorestframework-jwt==1.8.0
 oauthlib==2.0.0
+psycopg2==2.6.2
 PyJWT==1.4.2
 python3-openid==3.0.10
 requests==2.11.1

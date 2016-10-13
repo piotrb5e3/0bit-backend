@@ -102,6 +102,14 @@ class StaticPageTests(APITestCase):
         self.assertEqual(0, len(StaticPage.objects.filter(title=self.test_title)))
         self.assertEqual(0, len(StaticPage.objects.filter(contents=self.test_contents)))
 
+    def test_can_find_static_page_by_url(self):
+        url = reverse(self.list_url_name)
+        response = self.client.get(url + '?url=' + self.page0.url)
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.content, self.json_static_page_set_representation([self.page0]).encode())
+
     @classmethod
     def json_static_page_set_representation(cls, items):
         result = '['

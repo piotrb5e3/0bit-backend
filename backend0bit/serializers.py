@@ -12,4 +12,5 @@ class PostSerializer(serializers.ModelSerializer):
 class StaticPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaticPage
-        fields = ('id', 'title', 'url', 'contents')
+        fields = ('id', 'title', 'url', 'contents', 'order')
+        read_only_fields = ('order',)

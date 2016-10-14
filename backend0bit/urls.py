@@ -9,4 +9,5 @@ router.register(r'static-pages', views.StaticPageViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^sp-reorder$', views.reorder_staticpages, name='reorder-staticpages'),
 ]

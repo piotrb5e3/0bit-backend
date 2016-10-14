@@ -123,4 +123,72 @@ class StaticPageTests(APITestCase):
     @classmethod
     def json_static_page_representation(cls, page):
         return '{"id":' + str(page.id) + ',"title":"' + page.title + '","url":"' \
-               + page.url + '","contents":"' + page.contents + '"}'
+               + page.url + '","contents":"' + page.contents + '","order":' + str(page.order) + '}'
+
+
+class TestStaticPageOrdering(APITestCase):
+    sp0 = None
+    sp2 = None
+    sp1 = None
+    reorder_url = reverse('reorder-staticpages')
+    auth_token = None
+    order_data = None
+
+    def setUp(self):
+        self.sp0 = StaticPage.objects.create(title="a", url="b", contents="c")
+        self.sp1 = StaticPage.objects.create(title="aa", url="bb", contents="cc")
+        self.sp2 = StaticPage.objects.create(title="aaa", url="bbb", contents="ccc")
+
+        user = User.objects.create_user("username_f", "password_57634533")
+        payload = utils.jwt_payload_handler(user)
+        self.auth_token = utils.jwt_encode_handler(payload)
+
+    def test_correct_default_order(self):
+        self._assert_has_initial_order()
+
+    def test_can_reorder(self):
+        auth = 'JWT {0}'.format(self.auth_token)
+        response = self.client.post(self.reorder_url,
+                                    self._wrap_order_list([self.sp1.id, self.sp2.id, self.sp0.id]),
+                                    HTTP_AUTHORIZATION=auth)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(0, self.sp1.id)
+        self.assertEqual(1, self.sp2.id)
+        self.assertEqual(2, self.sp0.id)
+
+    def test_cant_reorder_if_not_authenticated(self):
+        response = self.client.post(self.reorder_url,
+                                    self._wrap_order_list([self.sp1.id, self.sp2.id, self.sp0.id]))
+
+        self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
+        self._assert_has_initial_order()
+
+    def test_cant_reorder_if_incorrect_param_number(self):
+        auth = 'JWT {0}'.format(self.auth_token)
+        response = self.client.post(self.reorder_url,
+                                    self._wrap_order_list([self.sp1.id, self.sp0.id]),
+                                    HTTP_AUTHORIZATION=auth)
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self._assert_has_initial_order()
+
+    def test_cant_reorder_if_not_all_ids_in_order(self):
+        auth = 'JWT {0}'.format(self.auth_token)
+        response = self.client.post(self.reorder_url,
+                                    self._wrap_order_list([self.sp1.id, self.sp0.id, self.sp0.id]),
+                                    HTTP_AUTHORIZATION=auth)
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self._assert_has_initial_order()
+
+    def _assert_has_initial_order(self):
+        self.assertEqual(0, self.sp0.id)
+        self.assertEqual(1, self.sp1.id)
+        self.assertEqual(2, self.sp2.id)
+
+    @classmethod
+    def _wrap_order_list(cls, order_list):
+        return {
+            "order": order_list
+        }

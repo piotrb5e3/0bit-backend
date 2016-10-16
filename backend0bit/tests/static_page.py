@@ -128,10 +128,16 @@ class StaticPageTests(APITestCase):
 
 class TestStaticPageOrdering(APITestCase):
     sp0 = None
-    sp2 = None
     sp1 = None
+    sp2 = None
+
+    order0 = 0
+    order1 = 0
+    order2 = 0
+
     reorder_url = reverse('reorder-staticpages')
     auth_token = None
+    auth = None
     order_data = None
 
     def setUp(self):
@@ -139,23 +145,30 @@ class TestStaticPageOrdering(APITestCase):
         self.sp1 = StaticPage.objects.create(title="aa", url="bb", contents="cc")
         self.sp2 = StaticPage.objects.create(title="aaa", url="bbb", contents="ccc")
 
+        self.order0 = self.sp0.order
+        self.order1 = self.sp1.order
+        self.order2 = self.sp2.order
+
         user = User.objects.create_user("username_f", "password_57634533")
         payload = utils.jwt_payload_handler(user)
         self.auth_token = utils.jwt_encode_handler(payload)
+        self.auth = 'JWT {0}'.format(self.auth_token)
 
     def test_correct_default_order(self):
         self._assert_has_initial_order()
 
     def test_can_reorder(self):
-        auth = 'JWT {0}'.format(self.auth_token)
         response = self.client.post(self.reorder_url,
                                     self._wrap_order_list([self.sp1.id, self.sp2.id, self.sp0.id]),
-                                    HTTP_AUTHORIZATION=auth)
+                                    HTTP_AUTHORIZATION=self.auth)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(0, self.sp1.id)
-        self.assertEqual(1, self.sp2.id)
-        self.assertEqual(2, self.sp0.id)
+        sp0 = StaticPage.objects.get(id=self.sp0.id)
+        sp1 = StaticPage.objects.get(id=self.sp1.id)
+        sp2 = StaticPage.objects.get(id=self.sp2.id)
+        self.assertEqual(2, sp0.order)
+        self.assertEqual(0, sp1.order)
+        self.assertEqual(1, sp2.order)
 
     def test_cant_reorder_if_not_authenticated(self):
         response = self.client.post(self.reorder_url,
@@ -165,27 +178,42 @@ class TestStaticPageOrdering(APITestCase):
         self._assert_has_initial_order()
 
     def test_cant_reorder_if_incorrect_param_number(self):
-        auth = 'JWT {0}'.format(self.auth_token)
         response = self.client.post(self.reorder_url,
                                     self._wrap_order_list([self.sp1.id, self.sp0.id]),
-                                    HTTP_AUTHORIZATION=auth)
+                                    HTTP_AUTHORIZATION=self.auth)
 
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self._assert_has_initial_order()
 
     def test_cant_reorder_if_not_all_ids_in_order(self):
-        auth = 'JWT {0}'.format(self.auth_token)
         response = self.client.post(self.reorder_url,
                                     self._wrap_order_list([self.sp1.id, self.sp0.id, self.sp0.id]),
-                                    HTTP_AUTHORIZATION=auth)
+                                    HTTP_AUTHORIZATION=self.auth)
 
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self._assert_has_initial_order()
 
+    def test_cant_reorder_with_non_integer_ids(self):
+        response = self.client.post(self.reorder_url,
+                                    self._wrap_order_list([self.sp1.id, "a", self.sp0.id]),
+                                    HTTP_AUTHORIZATION=self.auth)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self._assert_has_initial_order()
+
+    def test_cant_reorder_with_bad_json_data(self):
+        response = self.client.post(self.reorder_url,
+                                    self._wrap_order_list("[ad, 1, 89["),
+                                    HTTP_AUTHORIZATION=self.auth)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self._assert_has_initial_order()
+
     def _assert_has_initial_order(self):
-        self.assertEqual(0, self.sp0.id)
-        self.assertEqual(1, self.sp1.id)
-        self.assertEqual(2, self.sp2.id)
+        sp0 = StaticPage.objects.get(id=self.sp0.id)
+        sp1 = StaticPage.objects.get(id=self.sp1.id)
+        sp2 = StaticPage.objects.get(id=self.sp2.id)
+        self.assertEqual(self.order0, sp0.order)
+        self.assertEqual(self.order1, sp1.order)
+        self.assertEqual(self.order2, sp2.order)
 
     @classmethod
     def _wrap_order_list(cls, order_list):

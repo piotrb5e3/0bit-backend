@@ -15,6 +15,8 @@ class PostTests(APITestCase):
             "title": test_title,
             "contents": test_contents
         }
+    auth_token = None
+    auth = None
 
     def setUp(self):
         self.post0 = Post.objects.create(title="Title0", contents="TestTestTest")
@@ -22,6 +24,12 @@ class PostTests(APITestCase):
         user = User.objects.create_user("username", "password1")
         payload = utils.jwt_payload_handler(user)
         self.auth_token = utils.jwt_encode_handler(payload)
+        self.auth = 'JWT {0}'.format(self.auth_token)
+
+    def test_can_create_post(self):
+        post = Post.objects.create(title=self.test_title, contents=self.test_contents)
+        self.assertEqual(self.test_title, post.title)
+        self.assertEqual(self.test_contents, post.contents)
 
     def test_list_posts(self):
         url = reverse(self.list_url_name)
@@ -56,25 +64,21 @@ class PostTests(APITestCase):
 
     def test_can_crete_new_post_when_authenticated(self):
         url = reverse(self.list_url_name)
-        auth = 'JWT {0}'.format(self.auth_token)
-        response = self.client.post(url, self.test_post, HTTP_AUTHORIZATION=auth)
+        response = self.client.post(url, self.test_post, HTTP_AUTHORIZATION=self.auth)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(3, len(Post.objects.all()))
-
-        post = Post.objects.filter(title=self.test_title)
-
-        self.assertEqual(1, len(post))
-        self.assertEqual(post[0].title, self.test_title)
-        self.assertEqual(post[0].contents, self.test_contents)
+        self._assure_changes_successful()
 
     def test_can_update_post_when_authenticated(self):
         url = reverse(self.detail_url_name, args=[self.post0.id])
-        auth = 'JWT {0}'.format(self.auth_token)
-        response = self.client.patch(url, self.test_post, HTTP_AUTHORIZATION=auth)
+        response = self.client.patch(url, self.test_post, HTTP_AUTHORIZATION=self.auth)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(2, len(Post.objects.all()))
+        self._assure_changes_successful()
+
+    def _assure_changes_successful(self):
         post = Post.objects.filter(title=self.test_title)
         self.assertEqual(1, len(post))
         self.assertEqual(self.test_title, post[0].title)
@@ -85,16 +89,16 @@ class PostTests(APITestCase):
         response = self.client.patch(url, self.test_post)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(2, len(Post.objects.all()))
-        self.assertEqual(0, len(Post.objects.filter(title=self.test_title)))
-        self.assertEqual(0, len(Post.objects.filter(contents=self.test_contents)))
+        self._assert_unchanged_state()
 
     def test_cant_update_post_with_bad_token(self):
         url = reverse(self.detail_url_name, args=[self.post0.id])
-        auth = 'JWT {0}'.format("BAD" + self.auth_token)
-        response = self.client.patch(url, self.test_post, HTTP_AUTHORIZATION=auth)
+        response = self.client.patch(url, self.test_post, HTTP_AUTHORIZATION="BAD TKN")
 
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
+        self._assert_unchanged_state()
+
+    def _assert_unchanged_state(self):
         self.assertEqual(2, len(Post.objects.all()))
         self.assertEqual(0, len(Post.objects.filter(title=self.test_title)))
         self.assertEqual(0, len(Post.objects.filter(contents=self.test_contents)))

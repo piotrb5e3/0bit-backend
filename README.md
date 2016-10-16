@@ -14,6 +14,7 @@ You will need the following things properly installed on your computer.
 
 * `cd 0bit-backend`
 * `pip install -r requirements.txt`
+* For running coverage tests with nose: `pip install django-nose coverage`
 
 ## Configuration
 * `cd backend`

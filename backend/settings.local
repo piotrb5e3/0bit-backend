@@ -28,7 +28,9 @@ INSTALLED_APPS = [
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
+    '--exe',
     '--with-coverage',
+    '--cover-inclusive',
     '--cover-package=backend0bit',
 ]
 

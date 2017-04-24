@@ -1,5 +1,4 @@
 import json
-import sys
 from rest_framework import status
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
@@ -28,15 +27,17 @@ def reorder_staticpages(request):
         order = _get_order_from_request(request)
         reorder.set_staticpage_order(order)
         return Response("Successful", status=status.HTTP_200_OK)
-    except reorder.ReorderException:
-        return Response(sys.exc_info()[1].get_cause(), status=status.HTTP_400_BAD_REQUEST)
+    except reorder.ReorderException as e:
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 def _get_order_from_request(request):
     try:
         order = json.loads(request.body.decode()).get('order')
     except json.decoder.JSONDecodeError:
-        raise reorder.ReorderException("Passed data structure not in JSON form")
+        raise reorder.ReorderException(
+            "Passed data structure not in JSON format"
+        )
 
     try:
         return [int(x) for x in order]

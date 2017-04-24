@@ -2,7 +2,7 @@ import json
 from rest_framework import status
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from backend0bit.models import Post, StaticPage
 from backend0bit.serializers import PostSerializer, StaticPageSerializer
 from backend0bit import reorder
@@ -43,3 +43,9 @@ def _get_order_from_request(request):
         return [int(x) for x in order]
     except ValueError:
         raise reorder.ReorderException("Passed data structure incorrect")
+
+
+@api_view(['GET'])
+@permission_classes((permissions.AllowAny,))
+def api_status(request):
+    return Response("OK")

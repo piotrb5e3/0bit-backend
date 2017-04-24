@@ -32,6 +32,11 @@ You will need the following things properly installed on your computer.
 
 * `python manage.py test`
 
+### Updating dependencies
+* adjust `requirements.in`
+* `pip install pip-tools`
+* `pip-compile requirements.in > requirements.txt`
+
 ### Deploying
 
 * Create a `secretkey.txt` file in `backend` directory

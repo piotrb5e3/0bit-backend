@@ -1,11 +1,14 @@
+from django.db import transaction
 from backend0bit.models import StaticPage
 
 
+@transaction.atomic
 def set_staticpage_order(order):
     _sanitize_order_list(order)
     _set_safe_order_values()
 
     counter = 0
+
     for sp_id in order:
         sp = StaticPage.objects.get(id=sp_id)
         sp.order = counter

@@ -8,3 +8,4 @@ djangorestframework-jwt
 psycopg2
 django-nose
 coverage
+raven

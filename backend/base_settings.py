@@ -4,17 +4,6 @@ import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-with open(os.path.join(BASE_DIR, 'backend/secretkey.txt')) as f:
-    SECRET_KEY = f.read().strip()
-
-DEBUG = False
-
-ALLOWED_HOSTS = ['www.0bit.pw', '0bit.pw']
-
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,12 +11,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
     'allauth',
     'corsheaders',
-    'backend0bit.apps.Backend0BitConfig',
+    'raven.contrib.django.raven_compat',
+    'backend0bit',
+]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--exe',
+    '--with-coverage',
+    '--cover-inclusive',
+    '--cover-package=backend0bit',
 ]
 
 MIDDLEWARE = [
@@ -63,38 +62,32 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '0bit-dev',
-        'USER': '0bit-dev',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'ATOMIC_REQUESTS': True,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # noqa F405
     }
+
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # noqa E501
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # noqa E501
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # noqa E501
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # noqa E501
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -106,17 +99,17 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# REST API
 
 REST_USE_JWT = True
 
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
 
 REST_FRAMEWORK = {
@@ -127,26 +120,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logging/secretkey.txt'),
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
-
-CORS_ORIGIN_ALLOW_ALL = False

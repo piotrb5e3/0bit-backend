@@ -14,7 +14,6 @@ You will need the following things properly installed on your computer.
 
 * `cd 0bit-backend`
 * `pip install -r requirements.txt`
-* For running coverage tests with nose: `pip install django-nose coverage`
 
 ## Configuration
 * `cd backend`
@@ -37,7 +36,10 @@ You will need the following things properly installed on your computer.
 * `pip install pip-tools`
 * `pip-compile requirements.in > requirements.txt`
 
-### Deploying
+### Linting
+* `flake8`
+
+## Deploying
 
 * Create a `secretkey.txt` file in `backend` directory
 * [Deploy with apache `mod_wsgi`](https://docs.djangoproject.com/en/1.10/howto/deployment/wsgi/

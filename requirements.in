@@ -6,3 +6,5 @@ django-rest-auth
 djangorestframework
 djangorestframework-jwt
 psycopg2
+django-nose
+coverage

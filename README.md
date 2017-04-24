@@ -17,7 +17,7 @@ You will need the following things properly installed on your computer.
 
 ## Configuration
 * `cd backend`
-* `cp settings.local settings.py`
+* `cp local_settings.py settings.py`
 * Adjust configuration
 
 ### DB setup

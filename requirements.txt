@@ -14,6 +14,7 @@ django-filter==1.0.4
 django-nose==1.4.5
 django-rest-auth==0.9.1
 django==1.11.5            # via django-allauth, django-rest-auth
+djangorestframework-camel-case==0.2.0
 djangorestframework-jwt==1.11.0
 djangorestframework==3.6.4
 idna==2.6                 # via requests

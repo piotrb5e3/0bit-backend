@@ -4,6 +4,7 @@ django-cors-middleware
 django-filter
 django-rest-auth
 djangorestframework
+djangorestframework-camel-case
 djangorestframework-jwt
 psycopg2
 django-nose

@@ -1,4 +1,7 @@
 import json
+import pytz
+
+from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from rest_framework import status
@@ -94,9 +97,14 @@ class TestPost(APITestCase):
         url = reverse(self.detail_url_name, args=[self.post0.id])
         response = self.client.patch(url, self.test_post,
                                      HTTP_AUTHORIZATION=self.auth)
-
+        now = datetime.utcnow().replace(tzinfo=pytz.UTC)
+        print(str(now))
+        last_edited_date = Post.objects.get(pk=self.post0.id).last_edited_date
+        print(str(last_edited_date))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(2, len(Post.objects.all()))
+        self.assertIsNotNone(last_edited_date)
+        self.assertLess(last_edited_date, now)
         self._assure_changes_successful()
 
     def _assure_changes_successful(self):
@@ -139,8 +147,12 @@ class TestPost(APITestCase):
             "title": post.title,
             "contents": post.contents,
             "date": cls.print_date_like_API(post.date),
+            "lastEditedDate": cls.print_date_like_API(post.last_edited_date)
         }
 
     @classmethod
     def print_date_like_API(cls, date):
-        return date.isoformat()[:-6] + 'Z'
+        if date is not None:
+            return date.isoformat()[:-6] + 'Z'
+        else:
+            return None

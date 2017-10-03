@@ -1,6 +1,6 @@
-# 0bit-backend
+# ComfyMS-backend
 
-Backend for the 0bit app
+Backend of ComfyMS
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ You will need the following things properly installed on your computer.
 
 ## Installation
 
-* `cd 0bit-backend`
+* `cd ComfyMS-backend`
 * `pip install -r requirements.txt`
 
 ## Configuration

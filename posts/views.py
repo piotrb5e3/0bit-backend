@@ -9,9 +9,14 @@ from .models import Post
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.filter(published=True)
     serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return Post.objects.all()
+        return Post.objects.filter(published=True)
 
     @detail_route(methods=['post'],
                   permission_classes=(permissions.IsAuthenticated, ))

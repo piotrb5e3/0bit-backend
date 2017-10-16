@@ -7,13 +7,16 @@ from rest_framework.test import APITestCase
 from rest_framework_jwt import utils
 
 from posts.models import Post
-from posts.tests.factory import create_post, create_unpublished_post
+from posts.tests.factory import create_post
 
 
 class TestPost(APITestCase):
     unpublish_url_name = 'post-unpublish'
 
     published_post = None
+
+    auth_token = None
+    auth = None
 
     def setUp(self):
         self.published_post = create_post()

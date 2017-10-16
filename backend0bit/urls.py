@@ -5,7 +5,7 @@ from backend0bit.views import (StaticPageViewSet, reorder_staticpages,
 from posts.views import PostViewSet
 
 router = DefaultRouter()
-router.register(r'posts', PostViewSet)
+router.register(r'posts', PostViewSet, base_name='post')
 router.register(r'static-pages', StaticPageViewSet)
 
 urlpatterns = [

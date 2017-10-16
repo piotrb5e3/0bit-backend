@@ -7,7 +7,7 @@ from rest_framework.test import APITestCase
 from rest_framework_jwt import utils
 
 from posts.models import Post
-from posts.tests.factory import create_post, create_unpublished_post
+from posts.tests.factory import create_unpublished_post
 
 
 class TestPost(APITestCase):

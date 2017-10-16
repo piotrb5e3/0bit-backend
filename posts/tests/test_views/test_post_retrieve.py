@@ -1,8 +1,12 @@
 import json
 
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from rest_framework_jwt import utils
 
 from posts.tests.factory import (create_post, create_edited_post,
                                  create_unpublished_post)
@@ -16,12 +20,20 @@ class TestPostRetrieve(APITestCase):
     post1 = None
     unpublished_post = None
 
+    auth_token = None
+    auth = None
+
     def setUp(self):
         self.post0 = create_post()
         self.post1 = create_edited_post()
         self.unpublished_post = create_unpublished_post()
 
-    def test_list_only_published_posts(self):
+        user = User.objects.create_user("username", "password1")
+        payload = utils.jwt_payload_handler(user)
+        self.auth_token = utils.jwt_encode_handler(payload)
+        self.auth = 'JWT {0}'.format(self.auth_token)
+
+    def test_list_only_published_posts_when_anonymous(self):
         url = reverse(self.list_url_name)
         response = self.client.get(url)
         response.render()
@@ -30,6 +42,18 @@ class TestPostRetrieve(APITestCase):
         self.assertEqual(
             json.loads(response.content),
             self.json_post_set_representation([self.post0, self.post1])
+        )
+
+    def test_list_all_posts_when_authenticated(self):
+        url = reverse(self.list_url_name)
+        response = self.client.get(url, HTTP_AUTHORIZATION=self.auth)
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            json.loads(response.content),
+            self.json_post_set_representation(
+                [self.post0, self.post1, self.unpublished_post])
         )
 
     def test_post_details(self):
@@ -49,6 +73,17 @@ class TestPostRetrieve(APITestCase):
         response.render()
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_can_retrieve_unpublished_post_details_when_authorised(self):
+        url = reverse(self.detail_url_name, args=[self.unpublished_post.id])
+        response = self.client.get(url, HTTP_AUTHORIZATION=self.auth)
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            json.loads(response.content),
+            self.json_post_representation(self.unpublished_post)
+        )
 
     @classmethod
     def json_post_set_representation(cls, items):

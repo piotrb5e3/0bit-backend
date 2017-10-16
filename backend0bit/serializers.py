@@ -3,7 +3,8 @@ import pytz
 from datetime import datetime
 from rest_framework import serializers
 
-from backend0bit.models import Post, StaticPage
+from backend0bit.models import StaticPage
+from posts.models import Post
 
 
 class PostSerializer(serializers.ModelSerializer):

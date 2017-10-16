@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'raven.contrib.django.raven_compat',
     'backend0bit',
+    'posts',
 ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

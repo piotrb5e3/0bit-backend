@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 from rest_framework_jwt import utils
 from django.contrib.auth.models import User
 
-from backend0bit.models import Post
+from posts.models import Post
 
 
 class TestPost(APITestCase):

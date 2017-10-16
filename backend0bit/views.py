@@ -3,9 +3,10 @@ from rest_framework import status
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from backend0bit.models import Post, StaticPage
+from backend0bit.models import StaticPage
 from backend0bit.serializers import PostSerializer, StaticPageSerializer
 from backend0bit import reorder
+from posts.models import Post
 
 
 class PostViewSet(viewsets.ModelViewSet):

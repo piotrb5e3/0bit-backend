@@ -12,6 +12,7 @@ def create_post():
         title=fake.catch_phrase(),
         contents=fake.text(),
         date=fake.date_time(tzinfo=pytz.utc),
+        published=True,
     )
     p.save()
     return p
@@ -31,6 +32,18 @@ def create_edited_post():
         contents=fake.text(),
         date=created_date,
         last_edited_date=edited_date,
+        published=True,
     )
     p.save()
     return p
+
+
+def create_unpublished_post():
+        p = Post(
+            title=fake.catch_phrase(),
+            contents=fake.text(),
+            date=fake.date_time(tzinfo=pytz.utc),
+            published=False,
+        )
+        p.save()
+        return p

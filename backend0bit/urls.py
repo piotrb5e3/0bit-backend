@@ -1,17 +1,15 @@
 from django.conf.urls import include, url
 from rest_framework.routers import DefaultRouter
-from backend0bit import views
+from backend0bit.views import (StaticPageViewSet, reorder_staticpages,
+                               api_status)
+from posts.views import PostViewSet
 
 router = DefaultRouter()
-router.register(r'posts', views.PostViewSet)
-router.register(r'static-pages', views.StaticPageViewSet)
+router.register(r'posts', PostViewSet)
+router.register(r'static-pages', StaticPageViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
-    url(
-        r'^sp-reorder',
-        views.reorder_staticpages,
-        name='reorder-staticpages'
-    ),
-    url(r'^status', views.api_status, name='status')
+    url(r'^sp-reorder', reorder_staticpages, name='reorder-staticpages'),
+    url(r'^status', api_status, name='status')
 ]

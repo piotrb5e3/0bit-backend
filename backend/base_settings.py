@@ -28,6 +28,7 @@ NOSE_ARGS = [
     '--with-coverage',
     '--cover-inclusive',
     '--cover-package=backend0bit',
+    '--cover-package=posts',
 ]
 
 MIDDLEWARE = [

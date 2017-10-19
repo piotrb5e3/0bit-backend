@@ -41,8 +41,7 @@ class TestPostRetrieve(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             json.loads(response.content),
-            self.json_post_set_representation([self.post0, self.post1])
-        )
+            self.json_post_set_representation([self.post0, self.post1]))
 
     def test_list_all_posts_when_authenticated(self):
         url = reverse(self.list_url_name)
@@ -53,8 +52,7 @@ class TestPostRetrieve(APITestCase):
         self.assertEqual(
             json.loads(response.content),
             self.json_post_set_representation(
-                [self.post0, self.post1, self.unpublished_post])
-        )
+                [self.post0, self.post1, self.unpublished_post]))
 
     def test_post_details(self):
         url = reverse(self.detail_url_name, args=[self.post1.id])
@@ -82,8 +80,20 @@ class TestPostRetrieve(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             json.loads(response.content),
-            self.json_post_representation(self.unpublished_post)
-        )
+            self.json_post_representation(self.unpublished_post))
+
+    def test_can_retrieve_filtered_by_is_published_when_authenticated(self):
+        url = reverse(self.list_url_name)
+        response = self.client.get(
+            url,
+            {'published': False},
+            HTTP_AUTHORIZATION=self.auth)
+        response.render()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            json.loads(response.content),
+            self.json_post_set_representation([self.unpublished_post]))
 
     @classmethod
     def json_post_set_representation(cls, items):

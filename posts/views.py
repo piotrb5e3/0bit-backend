@@ -11,6 +11,7 @@ from .models import Post
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_fields = ('published',)
 
     def get_queryset(self):
         user = self.request.user

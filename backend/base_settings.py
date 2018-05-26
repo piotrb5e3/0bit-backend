@@ -73,20 +73,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    # noqa E501
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', # noqa E501
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    # noqa E501
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', # noqa E501
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    # noqa E501
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', # noqa E501
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    # noqa E501
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', # noqa E501
     },
 ]
 
@@ -123,7 +119,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_RENDERER_CLASSES': (
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',

@@ -1,4 +1,5 @@
-from .base_settings import *
+from .base_settings import os, BASE_DIR
+from .base_settings import * # noqa F403
 
 with open(os.path.join(BASE_DIR, 'backend/secretkey.txt')) as f:
     SECRET_KEY = f.read().strip()
